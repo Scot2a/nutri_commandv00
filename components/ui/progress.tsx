@@ -5,6 +5,36 @@ import { Progress as ProgressPrimitive } from "radix-ui"
 
 import { cn } from "@/lib/utils"
 
+interface ProgressProps extends React.ComponentPropsWithoutRef<typeof ProgressPrimitive.Root> {
+  indicatorColor?: string;
+}
+
+const Progress = React.forwardRef<
+  React.ElementRef<typeof ProgressPrimitive.Root>,
+  ProgressProps // 2. Use the new Interface here
+>(({ className, value, indicatorColor, ...props }, ref) => (
+  <ProgressPrimitive.Root
+    ref={ref}
+    className={cn(
+      "relative h-4 w-full overflow-hidden rounded-full bg-secondary",
+      className
+    )}
+    {...props}
+  >
+    <ProgressPrimitive.Indicator
+      // 3. Use indicatorColor here. We fall back to bg-primary if none is provided.
+      className={cn(
+        "h-full w-full flex-1 transition-all", 
+        indicatorColor ? indicatorColor : "bg-primary"
+      )}
+      style={{ transform: `translateX(-${100 - (value || 0)}%)` }}
+    />
+  </ProgressPrimitive.Root>
+))
+Progress.displayName = ProgressPrimitive.Root.displayName
+
+export { Progress }
+{/** 
 function Progress({
   className,
   value,
@@ -29,3 +59,4 @@ function Progress({
 }
 
 export { Progress }
+*/}

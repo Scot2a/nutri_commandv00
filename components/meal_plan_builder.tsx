@@ -15,11 +15,13 @@ import {
   DrawerTitle,
 } from '@/components/ui/drawer'
 import { Button } from '@/components/ui/button'
-import { Slider } from '@/components/ui/slider'
 import { Plus, X } from 'lucide-react'
 import  { MealPlanFood, useMealStore, type Meal } from '@/src/meal_store/use_meal_store'
 import { foodCategories, getFoodCategoryColor, type FoodItem } from '@/src/types/food'
+import { usePatientStore } from "@/src/patient_store/use_patient_store";
 import { getFoodbyCategory } from '@/app/data/database'
+import { MacroDashboard } from "@/components/macro_dashboard";
+import { access } from 'fs'
 
 interface MealPlanBuilderProps {
   meals: Meal[]
@@ -33,7 +35,29 @@ const mealTypeConfig = {
 }
 
 export function MealPlanBuilder({ meals }: MealPlanBuilderProps) {
-  const [drawerOpen, setDrawerOpen] = useState(false)
+  {/**const currentPlanTotals = React.useMemo(() => {
+    return meals.reduce (access, meal( => {
+      const foodsInMeal = mealTypeConfig.foods || [];
+      foodsInMeal.forEach((food:MealPlanFood) =>{
+        acc.calories += (food.calories * food.quantity);
+        acc.proteins_g += (food.proteins_g * food.quantity);
+        acc.carbs_g =+ (food.carbs_g * food.quantity);
+        acc.lipids_g =+ (food.lipids_g * food.quantity);
+      });
+      return acc;
+    }, { calories: 0, proteins_g: 0. carbs_g: 0, lipids_g: 0}); 
+  })
+  }); */}
+  const plans = useMealStore((state) => state.plans);
+  const currentPlanId = useMealStore((state) => state.currentPlanId);
+  const activePatientId = useMealStore ((state) => state.activePatientId);
+  const currentPlan = plans.find(p => p.id ===currentPlanId);
+  const activeMeals = currentPlan?.meals || [];
+  const patients = usePatientStore((state) => state.patients);
+  const activePatient = patients.find(p => p.id === activePatientId);
+  const latestRecord = activePatient?.records[activePatient.records.length - 1];
+  const targetMacros = latestRecord?.macros; 
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>(foodCategories[0].id)
   const [selectedMealId, setSelectedMealId] = useState<string>(meals[0]?.id || '')
   const [selectedFood, setSelectedFood] = useState<FoodItem | null>(null)
@@ -43,6 +67,21 @@ export function MealPlanBuilder({ meals }: MealPlanBuilderProps) {
   const addFoodToMeal = useMealStore((state) => state.addFoodToMeal)
   const categoryFoods = getFoodbyCategory(selectedCategory)
   const categoryColor = getFoodCategoryColor(selectedCategory)
+
+const currentPlanTotals = React.useMemo(() => {
+    const totals = { calories: 0, proteins_g: 0, carbs_g: 0, lipids_g: 0 };
+    
+    activeMeals.forEach(meal => {
+      meal.foods.forEach(food => {
+        totals.calories += (food.calories * food.quantity);
+        totals.proteins_g += (food.proteins_g * food.quantity);
+        totals.carbs_g += (food.carbs_g * food.quantity);
+        totals.lipids_g += (food.lipids_g * food.quantity);
+      });
+    });
+    
+    return totals;
+  }, [activeMeals]);
 
 const handleAddFood = () => {
     if (selectedFood && selectedMealId) {
@@ -101,6 +140,14 @@ const handleAddFood = () => {
 
   return (
     <>
+    <div className="max-w-6xl mx-auto p-6">
+    {/**THIS IS MACRODASHBOARD */}
+    <MacroDashboard 
+    current={currentPlanTotals}
+    target={targetMacros}
+    patientName={activePatient?.name}
+    />
+    </div>
       <Card className="border-border bg-card sticky top-4">
         <CardHeader className="pb-3">
           <CardTitle className="text-lg text-foreground">Add Foods</CardTitle>
