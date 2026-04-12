@@ -12,7 +12,6 @@ import { PatientProfiles } from "@/components/patient_profiles";
 import { useLayoutStore } from "@/src/main_store/use_layout_store";
 import { StatsCards } from "@/components/stats_cards";
 import { CalorieChart } from "@/components/calorie_chart";
-import { MacrosPanel } from "@/components/macros_panel";
 
 export default function NutritionistDashboard() {
 
@@ -73,7 +72,7 @@ export default function NutritionistDashboard() {
             <div className="grid grid-cols-1 md:grid-cols02 gap-6">
               {/*<FoodProgress macroTotals={MacroTotals} estimatedCalories={{estimatedCalories}}></FoodProgress>
             */}</div>
-            <div className="lg:col-span-1">
+            <div className="lg:col-span-3">
               <PatientProfiles></PatientProfiles>
             </div>
           </div>

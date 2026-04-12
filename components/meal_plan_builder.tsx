@@ -21,6 +21,7 @@ import { foodCategories, getFoodCategoryColor, type FoodItem } from '@/src/types
 import { usePatientStore } from "@/src/patient_store/use_patient_store";
 import { getFoodbyCategory } from '@/app/data/database'
 import { MacroDashboard } from "@/components/macro_dashboard";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { access } from 'fs'
 
 interface MealPlanBuilderProps {
@@ -35,22 +36,11 @@ const mealTypeConfig = {
 }
 
 export function MealPlanBuilder({ meals }: MealPlanBuilderProps) {
-  {/**const currentPlanTotals = React.useMemo(() => {
-    return meals.reduce (access, meal( => {
-      const foodsInMeal = mealTypeConfig.foods || [];
-      foodsInMeal.forEach((food:MealPlanFood) =>{
-        acc.calories += (food.calories * food.quantity);
-        acc.proteins_g += (food.proteins_g * food.quantity);
-        acc.carbs_g =+ (food.carbs_g * food.quantity);
-        acc.lipids_g =+ (food.lipids_g * food.quantity);
-      });
-      return acc;
-    }, { calories: 0, proteins_g: 0. carbs_g: 0, lipids_g: 0}); 
-  })
-  }); */}
+
   const plans = useMealStore((state) => state.plans);
   const currentPlanId = useMealStore((state) => state.currentPlanId);
   const activePatientId = useMealStore ((state) => state.activePatientId);
+  const setActivePatientId = useMealStore((state) => state.setActivePatientId);
   const currentPlan = plans.find(p => p.id ===currentPlanId);
   const activeMeals = currentPlan?.meals || [];
   const patients = usePatientStore((state) => state.patients);
@@ -67,6 +57,8 @@ export function MealPlanBuilder({ meals }: MealPlanBuilderProps) {
   const addFoodToMeal = useMealStore((state) => state.addFoodToMeal)
   const categoryFoods = getFoodbyCategory(selectedCategory)
   const categoryColor = getFoodCategoryColor(selectedCategory)
+
+
 
 const currentPlanTotals = React.useMemo(() => {
     const totals = { calories: 0, proteins_g: 0, carbs_g: 0, lipids_g: 0 };
@@ -141,6 +133,30 @@ const handleAddFood = () => {
   return (
     <>
     <div className="max-w-6xl mx-auto p-6">
+      <div className="flex items-center justify-between bg-secondary/5 p-4 rounded-lg border border-border">
+      <div className="space-y-1">
+        <label className="text-xs font-bold uppercase text-muted-foreground">Vincular Paciente</label>
+        <Select 
+          value={activePatientId || ""} 
+          onValueChange={(id) => setActivePatientId(id)}
+        >
+          <SelectTrigger className="w-[280px] bg-card">
+            <SelectValue placeholder="Seleccionar un paciente..." />
+          </SelectTrigger>
+          <SelectContent>
+            {patients.map((p) => (
+              <SelectItem key={p.id} value={p.id}>
+                {p.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+      
+      {/*The SAVE BUTTON */}
+      
+    </div>
+
     {/**THIS IS MACRODASHBOARD */}
     <MacroDashboard 
     current={currentPlanTotals}
@@ -189,6 +205,17 @@ const handleAddFood = () => {
             <Plus className="w-4 h-4 mr-2" />
             Select Food
           </Button>
+          <Button 
+        variant="default" 
+        className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg"
+        onClick={() => {
+          // Since Zustand saves in real-time, this can be a navigation or success toast
+          console.log("Plan guardado exitosamente");
+          alert("Plan Nutricional Guardado Correctamente");
+        }}
+      >
+        Guardar Cambios del Plan
+      </Button>
         </CardContent>
       </Card>
 

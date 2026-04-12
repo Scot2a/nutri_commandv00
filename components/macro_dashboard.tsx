@@ -1,4 +1,5 @@
 import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
 
 interface Macros {
   calories: number;
@@ -29,25 +30,60 @@ export function MacroDashboard({ current, target, patientName }: MacroDashboardP
     const ratio = curr / max;
     if (ratio > 1.05) return "bg-destructive"; // Over limit (Red)
     if (ratio > 0.96) return "bg-green-500";   // Perfect zone (Green)
-    return "bg-primary";                       // Filling up (Standard)
+    return "bg-blue-500";                       // Filling up (Standard)
   };
 
   return (
     <div className="bg-card border border-border rounded-xl p-4 shadow-sm mb-6">
-      <div className="flex justify-between items-center mb-4 border-b pb-2">
-        <h3 className="font-semibold text-foreground">
-          {isFreestyle ? "Plan Libre (Sin Límites)" : `Plan Nutricional: ${patientName}`}
-        </h3>
+      <div className="flex flex-row justify-between items-start sm:items-center mb-6 gap-4 border-b pb-4">
+        <div>
+          <h3 className="font-semibold text-foreground">
+            {isFreestyle ? "Plan Libre (Sin Límites)" : `Plan Nutricional: ${patientName}`}
+          </h3>
+          <p className="text-xs text-muted-foreground">Seguimiento nutricional en tiempo real</p>
+        </div>
         {!isFreestyle && (
-          <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full font-medium">
-            Límites Estrictos Activos
-          </span>
+          <Badge variant="outline" className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20">
+            Límites Clínicos Activos
+          </Badge>
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
         
+      {[
+          { label: "Calorías", value: current.calories, max: target?.calories, unit: "kcal" },
+          { label: "Proteína", value: current.proteins_g, max: target?.proteins_g, unit: "g" },
+          { label: "Carbs", value: current.carbs_g, max: target?.carbs_g, unit: "g" },
+          { label: "Lípidos", value: current.lipids_g, max: target?.lipids_g, unit: "g" },
+        ].map((item) => (
+          <div key={item.label} className="flex flex-col gap-2">
+            <div className="flex justify-between items-baseline">
+              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                {item.label}
+              </span>
+              <div className="text-right">
+                <span className="text-sm font-bold text-foreground">{item.value}</span>
+                <span className="text-[10px] ml-1 text-muted-foreground">
+                  {isFreestyle ? item.unit : `/ ${item.max}${item.unit}`}
+                </span>
+              </div>
+            </div>
+            {/* The progress bar now stays visible but empty if in Freestyle */}
+            <Progress 
+              value={!isFreestyle ? (item.value / item.max!) * 100 : 0} 
+              className={`h-2 ${!isFreestyle ? getProgressColor(item.value, item.max!) : "bg-primary/20"}`}
+              style={{ color: 'inherit' }}
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}  
+
         {/* CALORIES */}
+        {/*}
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground font-medium">Calorías</span>
@@ -58,13 +94,13 @@ export function MacroDashboard({ current, target, patientName }: MacroDashboardP
           {!isFreestyle && (
             <Progress 
               value={calcProgress(current.calories, target.calories)} 
-              indicatorColor={getProgressColor(current.calories, target.calories)}
-              className="h-2"
+              className={`h-2 ${getProgressColor(current.calories, target.calories)} [&>div]:bg-current`}
+              style={{ color: 'inherit' }} // This ensures the 'bg-current' knows what color to use
             />
           )}
         </div>
 
-        {/* PROTEINS */}
+        
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground font-medium">Proteína</span>
@@ -75,13 +111,12 @@ export function MacroDashboard({ current, target, patientName }: MacroDashboardP
           {!isFreestyle && (
              <Progress 
                value={calcProgress(current.proteins_g, target.proteins_g)} 
-               indicatorColor={getProgressColor(current.proteins_g, target.proteins_g)}
-               className="h-2"
+               className={`h-2 ${getProgressColor(current.proteins_g, target.proteins_g)} [&>div]:bg-current`}
+                style={{ color: 'inherit' }}
              />
           )}
         </div>
 
-        {/* CARBS */}
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground font-medium">Carbohidratos</span>
@@ -92,13 +127,13 @@ export function MacroDashboard({ current, target, patientName }: MacroDashboardP
           {!isFreestyle && (
              <Progress 
                value={calcProgress(current.carbs_g, target.carbs_g)} 
-               indicatorColor={getProgressColor(current.carbs_g, target.carbs_g)}
-               className="h-2"
+               className={`h-2 ${getProgressColor(current.carbs_g, target.carbs_g)} [&>div]:bg-current`}
+                style={{ color: 'inherit' }}
              />
           )}
         </div>
 
-        {/* LIPIDS */}
+        
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground font-medium">Lípidos</span>
@@ -109,8 +144,8 @@ export function MacroDashboard({ current, target, patientName }: MacroDashboardP
           {!isFreestyle && (
              <Progress 
                value={calcProgress(current.lipids_g, target.lipids_g)} 
-               indicatorColor={getProgressColor(current.lipids_g, target.lipids_g)}
-               className="h-2"
+               className={`h-2 ${getProgressColor(current.lipids_g, target.lipids_g)} [&>div]:bg-current`}
+                style={{ color: 'inherit' }}
              />
           )}
         </div>
@@ -118,4 +153,4 @@ export function MacroDashboard({ current, target, patientName }: MacroDashboardP
       </div>
     </div>
   );
-}
+} */}

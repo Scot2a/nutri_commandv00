@@ -9,7 +9,7 @@ interface ProgressProps extends React.ComponentPropsWithoutRef<typeof ProgressPr
   indicatorColor?: string;
 }
 
-const Progress = React.forwardRef<
+{/*const Progress = React.forwardRef<
   React.ElementRef<typeof ProgressPrimitive.Root>,
   ProgressProps // 2. Use the new Interface here
 >(({ className, value, indicatorColor, ...props }, ref) => (
@@ -34,7 +34,8 @@ const Progress = React.forwardRef<
 Progress.displayName = ProgressPrimitive.Root.displayName
 
 export { Progress }
-{/** 
+*/}
+ 
 function Progress({
   className,
   value,
@@ -51,12 +52,14 @@ function Progress({
     >
       <ProgressPrimitive.Indicator
         data-slot="progress-indicator"
-        className="h-full w-full flex-1 bg-primary transition-all"
-        style={{ transform: `translateX(-${100 - (value || 0)}%)` }}
+        className="h-full w-full flex-1 transition-all bg-[var(--progress-color,theme(colors.primary.DEFAULT))] " // Use the variable or fallback to primary
+        style={{ 
+          transform: `translateX(-${100 - (value || 0)}%)`,
+          "--progress-color": "inherit" // This allows it to inherit from the parent
+        } as React.CSSProperties}
       />
     </ProgressPrimitive.Root>
   )
 }
 
 export { Progress }
-*/}
