@@ -113,15 +113,21 @@ const handleAddFood = () => {
 
   // We loop through the cart to add every selected item
   Object.entries(stagedCart).forEach(([foodId, qty]) => {
-    // IMPORTANT: Make sure you use the category foods or a global search
-    // Using a flat find is safer here
-    const foodItem = getFoodbyCategory(selectedCategory).find(f => f.id === foodId)
+    //we search around all categories to find the food item
+    //this fixes the problem we had with only selected what was on the window
+    let foodItem: FoodItem | undefined; 
+    for (const category of foodCategories) {
+      foodItem = getFoodbyCategory(category.id).find(f => f.id === foodId);
+      if (foodItem) break; //we stop searching other categories when the item is found
+    }
     
     if (foodItem) {
       addFoodToMeal(selectedMealId, {
         ...foodItem,
         quantity: qty,
       })
+    } else{
+      console.warn(`Food item with ID ${foodId} not found in database.`);
     }
   })
 
@@ -221,7 +227,7 @@ const handleAddFood = () => {
 
       {/* Food Selection Drawer */}
       <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
-        <DrawerContent className="bg-card border-border max-h-[80vh]">
+        <DrawerContent className="bg-card border-border max-h-[90vh]">
           <DrawerHeader>
             <DrawerTitle className="text-foreground">Select Food</DrawerTitle>
             <DrawerDescription>
@@ -249,7 +255,7 @@ const handleAddFood = () => {
                 const foods = getFoodbyCategory(category.id);
                 return (
                 <TabsContent key={category.id} value={category.id} className="mt-4">
-                   <ScrollArea className="h-[500px] rounded-lg border border-border p-4 mt-4">
+                   <ScrollArea className="h-[328] rounded-lg border border-border p-4">
                   {foods.length === 0 ? (
                     <p className="p-8 text-center text-muted-foreground">No se han encontrado alimentos en {category.name}</p>
                   ) : (

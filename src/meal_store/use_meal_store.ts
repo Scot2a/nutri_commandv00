@@ -1,5 +1,6 @@
 
 import { create } from 'zustand'
+import { persist,createJSONStorage } from "zustand/middleware";
 import { ExchangeCategory, Micronutrients } from "@/src/types/food";
 
 export interface MealPlanFood extends Record<string, unknown> {
@@ -50,130 +51,130 @@ interface MealStore {
 }
 
 // 3. Build the Store
-export const useMealStore = create<MealStore>((set) => ({
-  // Initial State
-  plans: [],
-  currentPlanId: null,
-  activePatientId: null,
+export const useMealStore = create<MealStore>()(
+  persist(
+    (set) => ({
+      // Initial State
+      plans: [],
+      currentPlanId: null,
+      activePatientId: null,
 
-  setActivePatientId: (patientId) => set({ activePatientId: patientId}),
+      setActivePatientId: (patientId) => set({ activePatientId: patientId }),
 
-  // Functions (Actions)
-  createPlan: (date, patientId) => set((state) => {
-    const newPlan: MealPlan = {
-      id: `plan-${Date.now()}`,
-      name: `Plan nutricional - ${date}`,
-      date: date,
-      patientId: patientId || state.activePatientId,
-      meals: [
-        { id: `meal-breakfast-${Date.now()}`, type: 'breakfast', foods: [] },
-        { id: `meal-lunch-${Date.now()}-1`, type: 'lunch', foods: [] },
-        { id: `meal-snack-${Date.now()}-1`, type: 'snack', foods: [] },
-        { id: `meal-dinner-${Date.now()}`, type: 'dinner', foods: [] },
-      ],
+      createPlan: (date, patientId) => set((state) => {
+        const newPlan: MealPlan = {
+          id: `plan-${Date.now()}`,
+          name: `Plan nutricional - ${date}`,
+          date: date,
+          patientId: patientId || state.activePatientId,
+          meals: [
+            { id: `meal-breakfast-${Date.now()}`, type: 'breakfast', foods: [] },
+            { id: `meal-lunch-${Date.now()}-1`, type: 'lunch', foods: [] },
+            { id: `meal-snack-${Date.now()}-1`, type: 'snack', foods: [] },
+            { id: `meal-dinner-${Date.now()}`, type: 'dinner', foods: [] },
+          ],
+        }
+        return {
+          plans: [...state.plans, newPlan],
+          currentPlanId: newPlan.id,
+        }
+      }),
+
+      setCurrentPlan: (planId) => set({ currentPlanId: planId }),
+
+      addFoodToMeal: (mealId, food) => set((state) => ({
+        plans: state.plans.map((plan) => {
+          if (plan.id === state.currentPlanId) {
+            return {
+              ...plan,
+              meals: plan.meals.map((meal) =>
+                meal.id === mealId
+                  ? { ...meal, foods: [...meal.foods, food] }
+                  : meal
+              ),
+            }
+          }
+          return plan;
+        }),
+      })),
+
+      removeFoodFromMeal: (mealId, foodId) => set((state) => ({
+        plans: state.plans.map((plan) => {
+          if (plan.id === state.currentPlanId) {
+            return {
+              ...plan,
+              meals: plan.meals.map((meal) =>
+                meal.id === mealId
+                  ? { ...meal, foods: meal.foods.filter((f) => f.id !== foodId) }
+                  : meal
+              ),
+            }
+          }
+          return plan;
+        }),
+      })),
+
+      updateFoodQuantity: (mealId, foodId, quantity) => set((state) => ({
+        plans: state.plans.map((plan) => {
+          if (plan.id === state.currentPlanId) {
+            return {
+              ...plan,
+              meals: plan.meals.map((meal) =>
+                meal.id === mealId
+                  ? {
+                      ...meal,
+                      foods: meal.foods.map((f) =>
+                        f.id === foodId ? { ...f, quantity } : f
+                      ),
+                    }
+                  : meal
+              ),
+            }
+          }
+          return plan;
+        }),
+      })),
+
+      deletePlan: (planId) => set((state) => {
+        const updatedPlans = state.plans.filter((plan) => plan.id !== planId)
+        return {
+          plans: updatedPlans,
+          currentPlanId: state.currentPlanId === planId ? (updatedPlans[0]?.id || null) : state.currentPlanId,
+        }
+      }),
+
+      deleteMeal: (mealId) => set((state) => ({
+        plans: state.plans.map((plan) => {
+          if (plan.id === state.currentPlanId) {
+            return {
+              ...plan,
+              meals: plan.meals.filter((meal) => meal.id !== mealId),
+            }
+          }
+          return plan;
+        }),
+      })),
+
+      addMeal: (mealType) => set((state) => ({
+        plans: state.plans.map((plan) => {
+          if (plan.id === state.currentPlanId) {
+            const newMeal: Meal = {
+              id: `meal-${mealType}-${Date.now()}`,
+              type: mealType,
+              foods: [],
+            }
+            return {
+              ...plan,
+              meals: [...plan.meals, newMeal],
+            }
+          }
+          return plan;
+        }),
+      })),
+    }),
+    {
+      name: 'nutricommand-meal-storage', // Unique name for local storage
+      storage: createJSONStorage(() => localStorage),
     }
-    return {
-      plans: [...state.plans, newPlan],
-      currentPlanId: newPlan.id,
-    }
-  }),
-
-  setCurrentPlan: (planId) => set({ currentPlanId: planId }),
-
-  addFoodToMeal: (mealId, food) => set((state) => ({
-    plans: state.plans.map((plan) => {
-      if (plan.id === state.currentPlanId) {
-        return {
-          ...plan,
-          meals: plan.meals.map((meal) =>
-            meal.id === mealId
-              ? { ...meal, foods: [...meal.foods, food] }
-              : meal
-          ),
-        }
-      }
-      return plan
-    }),
-  })),
-
-  removeFoodFromMeal: (mealId, foodId) => set((state) => ({
-    plans: state.plans.map((plan) => {
-      if (plan.id === state.currentPlanId) {
-        return {
-          ...plan,
-          meals: plan.meals.map((meal) =>
-            meal.id === mealId
-              ? { ...meal, foods: meal.foods.filter((f) => f.id !== foodId) }
-              : meal
-          ),
-        }
-      }
-      return plan
-    }),
-  })),
-
-  updateFoodQuantity: (mealId, foodId, quantity) => set((state) => ({
-    plans: state.plans.map((plan) => {
-      if (plan.id === state.currentPlanId) {
-        return {
-          ...plan,
-          meals: plan.meals.map((meal) =>
-            meal.id === mealId
-              ? {
-                  ...meal,
-                  foods: meal.foods.map((f) =>
-                    f.id === foodId ? { ...f, quantity } : f
-                  ),
-                }
-              : meal
-          ),
-        }
-      }
-      return plan
-    }),
-  })),
-
-  deletePlan: (planId) => set((state) => {
-    const updatedPlans = state.plans.filter((plan) => plan.id !== planId)
-    //const newCurrentPlanId =
-      state.currentPlanId === planId
-        ? updatedPlans.length > 0
-          ? updatedPlans[0].id
-          : null
-        : state.currentPlanId
-    return {
-      plans: updatedPlans,
-      currentPlanId: state.currentPlanId === planId ? (updatedPlans[0]?.id || null) : state.currentPlanId,
-      //newCurrentPlanId
-    }
-  }),
-
-  deleteMeal: (mealId) => set((state) => ({
-    plans: state.plans.map((plan) => {
-      if (plan.id === state.currentPlanId) {
-        return {
-          ...plan,
-          meals: plan.meals.filter((meal) => meal.id !== mealId),
-        }
-      }
-      return plan
-    }),
-  })),
-
-  addMeal: (mealType) => set((state) => ({
-    plans: state.plans.map((plan) => {
-      if (plan.id === state.currentPlanId) {
-        const newMeal: Meal = {
-          id: `meal-${mealType}-${Date.now()}`,
-          type: mealType,
-          foods: [],
-        }
-        return {
-          ...plan,
-          meals: [...plan.meals, newMeal],
-        }
-      }
-      return plan
-    }),
-  })),
-}))
+  )
+)

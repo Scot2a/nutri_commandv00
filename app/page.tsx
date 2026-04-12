@@ -1,7 +1,7 @@
 "use client"
 
 import Image from "next/image";
-import { useReducer,useState } from "react";
+import { useEffect, useReducer,useState } from "react";
 import { ModeToggle } from "@/components/mode_toggle"
 import { DashboardSidebar,MobileHeader } from "@/components/dashboard_sidebar";
 import { Button } from "@/components/ui/button";
@@ -12,8 +12,18 @@ import { PatientProfiles } from "@/components/patient_profiles";
 import { useLayoutStore } from "@/src/main_store/use_layout_store";
 import { StatsCards } from "@/components/stats_cards";
 import { CalorieChart } from "@/components/calorie_chart";
+import { DashboardDailyProgress } from "@/components/daily_progress";
+import { DashboardRecentPlans } from "@/components/meal_plans_overview";
+
 
 export default function NutritionistDashboard() {
+
+    const[isHydrated, setIsHydrated] = useState(false);
+    useEffect(() => {
+      setIsHydrated(true);
+    },[]);
+
+    if (!isHydrated) return null;
 
   // We now don't even need the state here! 
   // The components inside will subscribe to the store themselves.
@@ -65,17 +75,19 @@ export default function NutritionistDashboard() {
 
         {/* Main items / grid */}
 
-        <div className="grid grid=cols=1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/*Everything on the left + progress bar + foodprogress */}
           <div className="lg:col-span-2 space-y-6">
             <CalorieChart></CalorieChart>
-            <div className="grid grid-cols-1 md:grid-cols02 gap-6">
-              {/*<FoodProgress macroTotals={MacroTotals} estimatedCalories={{estimatedCalories}}></FoodProgress>
-            */}</div>
-            <div className="lg:col-span-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <DashboardDailyProgress></DashboardDailyProgress>
+              <DashboardRecentPlans></DashboardRecentPlans>
+            </div>
+            
+          </div>
+          <div className="lg:col-span-1">
               <PatientProfiles></PatientProfiles>
             </div>
-          </div>
         </div>
         </div>
 
