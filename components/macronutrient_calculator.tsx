@@ -46,9 +46,21 @@ export function MacronutrientCalculator({
   const lipidGrams = lipidKcals / 9
 
   const totalKcals = proteinKcals + carboKcals + lipidKcals
-  const totalPercentage = proteinPercentage + parseFloat(carboPercentage) + parseFloat(lipidPercentage)
+  const totalPercentage = proteinPercentage + parseFloat(carboPercentage || "0") + parseFloat(lipidPercentage || "0")
 
-  const isValidDistribution = totalPercentage <= 100 && totalKcals <= get
+  const roundedTotalPercentage = Math.round(totalPercentage * 10) / 10;
+  const roundedTotalKcals = Math.round(totalKcals);
+
+  const displayPercentage = parseFloat(totalPercentage.toFixed(1));
+  const isWithinMargin = displayPercentage >= 99.7 && displayPercentage <= 100.3;
+
+  const isValidDistribution = roundedTotalPercentage >= 99.7 && 
+                            roundedTotalPercentage <= 100.2 && 
+                            roundedTotalKcals <= (get + 10);
+                            isWithinMargin && totalKcals <= (get + 10)
+
+
+  
 
   const handleCarboChange = (value: string) => {
     const num = parseFloat(value) || 0
@@ -193,8 +205,8 @@ export function MacronutrientCalculator({
               <div>
                 <p className="text-xs text-muted-foreground mb-1">Total Percentage</p>
                 <div className="flex items-baseline gap-2">
-                  <div className={`text-2xl font-bold ${totalPercentage > 100 ? 'text-red-500' : 'text-primary'}`}>
-                    {totalPercentage.toFixed(1)}%
+                  <div className={`text-2xl font-bold ${displayPercentage > 100.3 ? 'text-red-500' : 'text-primary'}`}>
+                    {displayPercentage}%
                   </div>
                 </div>
               </div>

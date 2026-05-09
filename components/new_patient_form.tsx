@@ -10,7 +10,7 @@ import { BMRCalculator } from '@/components/bmr_calculator'
 import { GETCalculator } from "@/components/get_calculator";
 import { PatientHistoryForm } from "@/components/patient_history_form";
 import { MacronutrientCalculator, type MacroData } from "@/components/macronutrient_calculator";
-import { ChevronDown } from 'lucide-react'
+import { ChevronDown, Mars, Venus } from 'lucide-react'
 import { usePatientStore, type PatientHistory, ClinicalRecord } from '@/src/patient_store/use_patient_store'
 
 
@@ -178,7 +178,7 @@ export function NewPatientForm({ onPatientCreated }: NewPatientFormProps = {}) {
               onClick={() => handleGenderSelect('male')}
               className="p-8 rounded-lg border-2 border-border hover:border-primary hover:bg-primary/5 transition-all group"
             >
-              <div className="text-4xl mb-3">👨</div>
+              <div className="text-4xl mb-3"><Mars></Mars></div>
               <p className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors">
                 Male
               </p>
@@ -187,7 +187,7 @@ export function NewPatientForm({ onPatientCreated }: NewPatientFormProps = {}) {
               onClick={() => handleGenderSelect('female')}
               className="p-8 rounded-lg border-2 border-border hover:border-primary hover:bg-primary/5 transition-all group"
             >
-              <div className="text-4xl mb-3">👩</div>
+              <div className="text-4xl mb-3"><Venus></Venus></div>
               <p className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors">
                 Female
               </p>

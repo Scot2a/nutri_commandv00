@@ -19,7 +19,7 @@ import { Plus, X } from 'lucide-react'
 import  { MealPlanFood, useMealStore, type Meal } from '@/src/meal_store/use_meal_store'
 import { foodCategories, getFoodCategoryColor, type FoodItem } from '@/src/types/food'
 import { usePatientStore } from "@/src/patient_store/use_patient_store";
-import { getFoodbyCategory } from '@/app/data/database'
+import { getFoodbyCategory } from '@/app/(dashboard)/dashboard/database'
 import { MacroDashboard } from "@/components/macro_dashboard";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { access } from 'fs'

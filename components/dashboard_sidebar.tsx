@@ -35,17 +35,17 @@ interface NavItem{
 }
 
 const navItems:NavItem[] = [
-    {icon: LayoutDashboard, label: "Panel de control", href:"/" ,active: true},
-    {icon: Users,label: "Pacientes", href: "/patients", badge: 2},
-    {icon: Apple, label: "Plan nutricional", href:"/meal-plans"},
-    {icon: Calendar, label: "Calendario", href:"/schedule"},
-    {icon: PieChart, label: "Análisis", href:"/analysis"},
-    {icon: Smartphone, label: "Test", href:"/test"},
+    {icon: LayoutDashboard, label: "Panel de control", href:"/dashboard" ,active: true},
+    {icon: Users,label: "Pacientes", href: "/dashboard/patients", badge: 2},
+    {icon: Apple, label: "Plan nutricional", href:"/dashboard/meal-plans"},
+    {icon: Calendar, label: "Calendario", href:"/dashboard/schedule"},
+    {icon: PieChart, label: "Análisis", href:"/dashboard/analysis"},
+    {icon: Smartphone, label: "Test", href:"/dashboard/test"},
 ]
 
 const bottomItems: NavItem[] = [
     {icon: Bell, label: "Notificaciones", href:"alarms", badge: 3},
-    {icon: Settings, label: "Ajustes", href:"/config"},
+    {icon: Settings, label: "Ajustes", href:"/dashboard/config"},
 ]
 
 

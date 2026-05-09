@@ -45,10 +45,13 @@
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
+  /*colors for landing*/
+  --header-border: var (--header-b);
 }
 
 :root {
---background: #FFFFFF;
+--background: #FFFDFA;
+  --header-b:  rgb(71 85 105);
   --foreground: #2C3E50;
   --card: #F0EEE9;
   --card-foreground: #2C3E50;
@@ -63,7 +66,7 @@
   --accent: #FF6B6B;
   --accent-foreground: #FFFFFF;
   --destructive: #FF6B6B;
-  --destructive-foreground: #FFFFFF;
+  --destructive-foreground: #FFFDFA;
   --border: #E8E6E1;
   --input: #F0EEE9;
   --ring: #4ade80;
@@ -122,10 +125,8 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
-    @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
     @apply bg-background text-foreground;
   }
 }
