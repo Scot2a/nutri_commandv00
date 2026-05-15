@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-// NEW: Import Shadcn Select components
+
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { usePatientStore, Patient, ClinicalRecord } from "@/src/patient_store/use_patient_store";
 import { Plus, Pencil } from "lucide-react";
@@ -42,13 +42,17 @@ export function PatientActionDialog({ isOpen, onClose, patientId, mode }: Patien
   const addNewRecord = usePatientStore((state) => state.addNewRecord);
 
   const patient = patients.find((p) => p.id === patientId);
-  const latestRecord = patient?.records[patient.records.length - 1];
+  
+  // Get latest record, but it's okay if it's null (new patients)
+  const latestRecord = patient?.records && patient.records.length > 0 
+    ? patient.records[patient.records.length - 1] 
+    : null;
 
   const [formData, setFormData] = useState<RecordFormState>({
     weight: 0,
     height: 0,
     age: 0,
-    pa: 1.2, // Default to lowest
+    pa: 1.2,
     notes: "",
     protein_g: 0,
     carbs_g: 0,
@@ -57,74 +61,81 @@ export function PatientActionDialog({ isOpen, onClose, patientId, mode }: Patien
   });
 
   useEffect(() => {
-    if (latestRecord) {
+    if (isOpen && patient) {
       setFormData({
-        weight: latestRecord.weight,
-        height: latestRecord.height,
-        age: latestRecord.age,
-        pa: latestRecord.pa || 1.2,
-        notes: latestRecord.notes || "",
-        protein_g: 0,
-        carbs_g: 0,
-        lipids_g: 0,
-        calories: 0,
+        weight: latestRecord?.weight || 0,
+        height: latestRecord?.height || 0,
+        age: latestRecord?.age || 0,
+        pa: latestRecord?.pa || 1.2,
+        notes: mode === 'edit' ? (latestRecord?.notes || "") : "",
+        protein_g: latestRecord?.macros?.proteins_g || 0,
+        carbs_g: latestRecord?.macros?.carbs_g || 0,
+        lipids_g: latestRecord?.macros?.lipids_g || 0,
+        calories: latestRecord?.macros?.calories || 0,
       });
     }
-  }, [isOpen, latestRecord]);
+  }, [isOpen, patient, latestRecord, mode]);
 
-  if (!patient || !latestRecord) return null;
-
-  // --- DYNAMIC CALCULATIONS ---
-  // Using Mifflin-St Jeor as the baseline for the dynamic average. 
-  // If you use a different formula, just swap the math here!
-  const calculateDynamicGEB = () => {
-    if (!formData.weight || !formData.height || !formData.age) return latestRecord.gebAverage;
-    const base = (10 * formData.weight) + (6.25 * formData.height) - (5 * formData.age);
-    return patient.gender === "male" ? base + 5 : base - 161;
-  };
-
-  const currentGEB = Math.round(calculateDynamicGEB());
-  const currentGET = Math.round(currentGEB * formData.pa + currentGEB * 0.1);
-  // -----------------------------
-
+  // --- HELPER FUNCTIONS (The ones that went missing!) ---
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: name === 'notes' ? value : Number(value) }));
+    setFormData((prev) => ({ 
+      ...prev, 
+      [name]: name === 'notes' ? value : Number(value) 
+    }));
   };
 
-  // Special handler for Shadcn Select
   const handleSelectChange = (value: string) => {
     setFormData((prev) => ({ ...prev, pa: Number(value) }));
   };
 
+  // --- DYNAMIC CALCULATIONS ---
+  const calculateDynamicGEB = () => {
+    if (!formData.weight || !formData.height || !formData.age) return latestRecord?.gebAverage || 0;
+    const base = (10 * formData.weight) + (6.25 * formData.height) - (5 * formData.age);
+    // Use optional chaining for gender just in case
+    return patient?.gender === "male" ? base + 5 : base - 161;
+  };
+
+  const currentGEB = Math.round(calculateDynamicGEB());
+  const currentGET = Math.round(currentGEB * formData.pa); //+ currentGEB * 0.1);
+
+  if (!patient) return null;
+
   const handleSubmit = () => {
+
+    const finalProtein = formData.protein_g > 0 ? formData.protein_g : Math.round((currentGET * 0.20) / 4);
+    const finalCarbs = formData.carbs_g > 0 ? formData.carbs_g : Math.round((currentGET * 0.50) / 4);
+    const finalLipids = formData.lipids_g > 0 ? formData.lipids_g : Math.round((currentGET * 0.30) / 9);
+    const finalCalories = formData.calories > 0 ? formData.calories : currentGET;
+
     const updatedRecordData: Omit<ClinicalRecord, 'id' | 'date'> = {
       weight: formData.weight,
       height: formData.height,
       age: formData.age,
-      gebAverage: currentGEB, // Save the dynamically calculated value!
-      get: currentGET,        // Save the dynamically calculated value!
+      gebAverage: currentGEB,
+      get: currentGET,
       pa: formData.pa,
       notes: formData.notes,
       macros: {
-        proteins_g: formData.protein_g > 0 ? formData.protein_g : (latestRecord.macros.proteins_g || 0),
-        carbs_g: formData.carbs_g > 0 ? formData.carbs_g : (latestRecord.macros.carbs_g || 0),
-        lipids_g: formData.lipids_g > 0 ? formData.lipids_g : (latestRecord.macros.lipids_g || 0),
-        calories: formData.calories > 0 ? formData.calories: (latestRecord.macros.calories || 0),
-
-        amount_g: 
-        (formData.protein_g > 0 ? formData.protein_g : (latestRecord.macros.proteins_g || 0)) + 
-        (formData.carbs_g > 0 ? formData.carbs_g : (latestRecord.macros.carbs_g || 0)) + 
-        (formData.lipids_g > 0 ? formData.lipids_g : (latestRecord.macros.lipids_g || 0)),
-      
+        proteins_g: finalProtein,
+        carbs_g: finalCarbs,
+        lipids_g: finalLipids,
+        calories: finalCalories,
+        amount_g: finalProtein + finalCarbs + finalLipids,
       },
     };
 
-    if (mode === 'edit') {
+    if (mode === 'edit' && latestRecord) {
       updateLatestRecord(patientId, updatedRecordData);
     } else {
+      // 2. THE FIX: Safe ID generation (Prevents silent crashes on local HTTP dev environments)
+      const safeId = typeof crypto !== 'undefined' && crypto.randomUUID 
+        ? crypto.randomUUID() 
+        : `record-${Date.now()}`;
+
       const newFollowupRecord: ClinicalRecord = {
-        id: crypto.randomUUID(),
+        id: safeId,
         date: new Date().toISOString(),
         ...updatedRecordData,
       };
@@ -137,14 +148,12 @@ export function PatientActionDialog({ isOpen, onClose, patientId, mode }: Patien
   const ActionIcon = isEdit ? Pencil : Plus;
   const dialogTitle = isEdit ? `Editar Datos Clínicos` : `Registrar Nuevo Seguimiento`;
 
-  // Inside PatientActionDialog.tsx - Replace the entire return() section with this one:
-
 return (
   <Dialog open={isOpen} onOpenChange={onClose}>
     <DialogContent className="max-w-2xl bg-card border-border overflow-hidden p-0 flex flex-col h-[90vh]">
       
       {/* 1. CONTAINED SCROLL AREA FIX */}
-      <DialogHeader className="p-6 pb-4 border-b flex-shrink-0">
+      <DialogHeader className="p-6 pb-4 border-b shrink-0">
         <DialogTitle className="flex items-center gap-2 text-foreground">
           <ActionIcon className={`w-5 h-5 ${isEdit ? 'text-secondary' : 'text-primary'}`} />
           {dialogTitle} - {patient.name}
@@ -152,7 +161,7 @@ return (
       </DialogHeader>
 
       {/* 2. THE MAIN FORM CONTENT (Now contained and scrolling) */}
-      <div className="flex-grow overflow-y-auto p-6 space-y-8 pr-3">
+      <div className="grow overflow-y-auto p-6 space-y-8 pr-3">
         
         {/* TOP SECTION: Antropometría (Sidebar) & Metabolismo (Main) */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -256,12 +265,12 @@ return (
 
             {/* CALORIES ROW */}
             <div className="flex items-center text-sm font-medium">Calorías (kcal)</div>
-            <div className="text-sm text-muted-foreground">{latestRecord.macros?.calories || 0}</div>
+            <div className="text-sm text-muted-foreground">{(latestRecord?.get || (latestRecord?.macros?.calories as any)?.get || 0).toFixed(2)}</div>
             <div className="text-sm font-bold text-primary">{currentGET}</div>
             <Input 
               type="number" 
               name="calories" 
-              value={formData.calories || ""} 
+              value={formData.calories === 0 ? "": formData.calories} 
               onChange={handleInputChange} 
               className="h-9 border border-secondary/50 focus-visible:ring-secondary text-foreground bg-white rounded-md"
               placeholder="0"
@@ -269,7 +278,7 @@ return (
 
             {/* PROTEIN ROW */}
             <div className="flex items-center text-sm font-medium">Proteína (g)</div>
-            <div className="text-sm text-muted-foreground">{latestRecord.macros?.proteins_g || 0}</div>
+            <div className="text-sm text-muted-foreground">{(latestRecord?.macros?.proteins_g || (latestRecord?.macros as any)?.proteinGrams || 0).toFixed(1)}</div>
             <div className="text-sm font-bold text-primary">
               {Math.round((currentGET * 0.20) / 4)} 
             </div>
@@ -284,7 +293,7 @@ return (
 
             {/* CARBS ROW (Added Back) */}
             <div className="flex items-center text-sm font-medium">Carbos (g)</div>
-            <div className="text-sm text-muted-foreground">{latestRecord.macros?.carbs_g || 0}</div>
+            <div className="text-sm text-muted-foreground">{(latestRecord?.macros?.carbs_g || (latestRecord?.macros as any)?.carbohydrateGrams || 0).toFixed(1)}</div>
             <div className="text-sm font-bold text-primary">
               {Math.round((currentGET * 0.50) / 4)}
             </div>
@@ -299,7 +308,7 @@ return (
 
             {/* LIPIDS ROW (Added Back) */}
             <div className="flex items-center text-sm font-medium">Grasas (g)</div>
-            <div className="text-sm text-muted-foreground">{latestRecord.macros?.lipids_g || 0}</div>
+            <div className="text-sm text-muted-foreground">{(latestRecord?.macros?.lipids_g || (latestRecord?.macros as any)?.lipidGrams || 0).toFixed(1)}</div>
             <div className="text-sm font-bold text-primary">
               {Math.round((currentGET * 0.30) / 9)}
             </div>
@@ -330,7 +339,7 @@ return (
       </div>
 
       {/* 3. CONTAINED FOOTER */}
-      <div className="flex justify-end gap-3 p-6 border-t border-border mt-auto flex-shrink-0">
+      <div className="flex justify-end gap-3 p-6 border-t border-border mt-auto shrink-0">
         <Button variant="outline" onClick={onClose}>Cancelar</Button>
         <Button onClick={handleSubmit} className={isEdit ? "bg-secondary hover:bg-secondary/90 text-secondary-foreground" : ""}>
             {isEdit ? "Actualizar Registro" : "Crear Nuevo Registro de Seguimiento"}

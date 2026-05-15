@@ -1,5 +1,5 @@
 'use client'
-
+/*
 import { useState } from 'react'
 import {
   Dialog,
@@ -55,7 +55,7 @@ export function EditPatientDialog({ patient, onClose, onSave }: EditPatientDialo
 
         <div className="space-y-4">
           {/* Name */}
-          <div className="space-y-2">
+/*          <div className="space-y-2">
             <label className="text-sm font-medium text-foreground">
               Name <span className="text-destructive">*</span>
             </label>
@@ -68,7 +68,7 @@ export function EditPatientDialog({ patient, onClose, onSave }: EditPatientDialo
           </div>
 
           {/* Email */}
-          <div className="space-y-2">
+  /*        <div className="space-y-2">
             <label className="text-sm font-medium text-foreground">
               Email <span className="text-destructive">*</span>
             </label>
@@ -82,7 +82,7 @@ export function EditPatientDialog({ patient, onClose, onSave }: EditPatientDialo
           </div>
 
           {/* Phone */}
-          <div className="space-y-2">
+    /*      <div className="space-y-2">
             <label className="text-sm font-medium text-foreground">Phone</label>
             <Input
               type="tel"
@@ -94,7 +94,7 @@ export function EditPatientDialog({ patient, onClose, onSave }: EditPatientDialo
           </div>
 
           {/* Notes */}
-          <div className="space-y-2">
+      /*    <div className="space-y-2">
             <label className="text-sm font-medium text-foreground">Notes</label>
             <textarea
               value={formData.notes}
@@ -105,7 +105,7 @@ export function EditPatientDialog({ patient, onClose, onSave }: EditPatientDialo
           </div>
 
           {/* Gender (Read-only) */}
-          <div className="space-y-2">
+        /*  <div className="space-y-2">
             <label className="text-sm font-medium text-foreground">Gender</label>
             <div className="px-3 py-2 rounded-lg bg-secondary/20 border border-border text-foreground capitalize">
               {formData.gender}
@@ -134,3 +134,4 @@ export function EditPatientDialog({ patient, onClose, onSave }: EditPatientDialo
     </Dialog>
   )
 }
+*/

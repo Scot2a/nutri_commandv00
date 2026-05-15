@@ -16,9 +16,9 @@ export interface MacroData {
   proteinMultiplier: number
   proteinGrams: number
   proteinKcals: number
-  carbohydratePercentage: number
-  carbohydrateKcals: number
-  carbohydrateGrams: number
+  carbs_percentage: number
+  carbs_kcal: number
+  carbs_g: number
   lipidPercentage: number
   lipidKcals: number
   lipidGrams: number
@@ -31,7 +31,7 @@ export function MacronutrientCalculator({
   onNext,
 }: MacronutrientCalculatorProps) {
   const [proteinMultiplier, setProteinMultiplier] = useState('1.6')
-  const [carboPercentage, setCarboPercentage] = useState('45')
+  const [carbs_percentage, setCarbsPercentage] = useState('45')
   const [lipidPercentage, setLipidPercentage] = useState('30')
 
   const proteinGrams = parseFloat(proteinMultiplier) * bodyWeight
@@ -39,14 +39,14 @@ export function MacronutrientCalculator({
   const proteinPercentage = (proteinKcals / get) * 100
 
   const remainingKcals = get - proteinKcals
-  const carboKcals = Math.min((parseFloat(carboPercentage) / 100) * get, remainingKcals)
-  const carboGrams = carboKcals / 4
+  const carbs_kcal = Math.min((parseFloat(carbs_percentage) / 100) * get, remainingKcals)
+  const carbs_g = carbs_kcal / 4
 
   const lipidKcals = Math.min((parseFloat(lipidPercentage) / 100) * get, remainingKcals)
   const lipidGrams = lipidKcals / 9
 
-  const totalKcals = proteinKcals + carboKcals + lipidKcals
-  const totalPercentage = proteinPercentage + parseFloat(carboPercentage || "0") + parseFloat(lipidPercentage || "0")
+  const totalKcals = proteinKcals + carbs_kcal + lipidKcals
+  const totalPercentage = proteinPercentage + parseFloat(carbs_percentage || "0") + parseFloat(lipidPercentage || "0")
 
   const roundedTotalPercentage = Math.round(totalPercentage * 10) / 10;
   const roundedTotalKcals = Math.round(totalKcals);
@@ -55,7 +55,7 @@ export function MacronutrientCalculator({
   const isWithinMargin = displayPercentage >= 99.7 && displayPercentage <= 100.3;
 
   const isValidDistribution = roundedTotalPercentage >= 99.7 && 
-                            roundedTotalPercentage <= 100.2 && 
+                            roundedTotalPercentage <= 100.3 && 
                             roundedTotalKcals <= (get + 10);
                             isWithinMargin && totalKcals <= (get + 10)
 
@@ -65,7 +65,7 @@ export function MacronutrientCalculator({
   const handleCarboChange = (value: string) => {
     const num = parseFloat(value) || 0
     if (num >= 0 && num <= 100) {
-      setCarboPercentage(value)
+      setCarbsPercentage(value)
     }
   }
 
@@ -82,9 +82,9 @@ export function MacronutrientCalculator({
         proteinMultiplier: parseFloat(proteinMultiplier),
         proteinGrams,
         proteinKcals,
-        carbohydratePercentage: parseFloat(carboPercentage),
-        carbohydrateKcals: carboKcals,
-        carbohydrateGrams: carboGrams,
+        carbs_percentage: parseFloat(carbs_percentage),
+        carbs_kcal: carbs_kcal,
+        carbs_g: carbs_g,
         lipidPercentage: parseFloat(lipidPercentage),
         lipidKcals: lipidKcals,
         lipidGrams: lipidGrams,
@@ -147,7 +147,7 @@ export function MacronutrientCalculator({
                 <h3 className="font-semibold text-foreground">Carbohydrates</h3>
                 <Input
                   type="number"
-                  value={carboPercentage}
+                  value={carbs_percentage}
                   onChange={(e) => handleCarboChange(e.target.value)}
                   className="w-16 h-8 bg-secondary/20 border-border text-xs"
                   min="0"
@@ -157,10 +157,10 @@ export function MacronutrientCalculator({
               </div>
               <div className="space-y-1 text-sm">
                 <div className="text-2xl font-bold text-blue-500">
-                  {carboKcals.toFixed(0)} kcal
+                  {carbs_kcal.toFixed(0)} kcal
                 </div>
                 <div className="text-muted-foreground">
-                  {carboGrams.toFixed(1)}g
+                  {carbs_g.toFixed(1)}g
                 </div>
               </div>
             </div>

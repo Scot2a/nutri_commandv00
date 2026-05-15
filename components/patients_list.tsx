@@ -5,10 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/componen
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-// Added Plus and Pencil (replacing Edit2 if you prefer Pencil)
 import { Trash2, Pencil, Plus, Mail, Phone, Calendar } from "lucide-react" 
 import type { Patient } from "@/src/patient_store/use_patient_store"
-// Ensure this component actually exists and is named correctly
 import { PatientActionDialog } from "@/components/patient_action_dialog" 
 
 interface PatientsListProps {
@@ -107,7 +105,7 @@ export function PatientsList({ patients, onDelete, onUpdate }: PatientsListProps
                     </div>
                   </CardHeader>
 
-                  <CardContent className="space-y-3 flex-grow">
+                  <CardContent className="space-y-3 grow">
                     <div className="flex items-center gap-2">
                       <Mail className="w-4 h-4 text-muted-foreground shrink-0" />
                       <span className="text-sm text-foreground truncate">{patient.email}</span>

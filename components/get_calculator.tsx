@@ -24,8 +24,8 @@ export function GETCalculator({ gebAverage, onNext }: GETCalculatorProps) {
 
     const calculateGET = () => {
         if (selectedPA === null) return null
-        const eta = gebAverage * 0.1
-        return gebAverage * selectedPA + eta            
+        //const eta = gebAverage * 0.1
+        return gebAverage * selectedPA //+ eta            
     }
         
     const get = calculateGET()
@@ -77,7 +77,7 @@ export function GETCalculator({ gebAverage, onNext }: GETCalculatorProps) {
           </div>
 
           {/* ETA Display */}
-          {selectedPA !== null && (
+{/*          {selectedPA !== null && (
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground">
                 Efecto Termogénico de los Alimentos (ETA) - 10% of GEB
@@ -88,20 +88,22 @@ export function GETCalculator({ gebAverage, onNext }: GETCalculatorProps) {
                 </div>
               </div>
             </div>
-          )}
+          )}* */}
 
           {/* GET Result */}
           {get !== null && (
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground">
-                Total Daily Energy Expenditure (GET)
+               {/**  Total Daily Energy Expenditure (GET)*/}
+               Gasto Energético Total (GET)
               </label>
               <div className="p-4 rounded-lg bg-primary/20 border-2 border-primary">
                 <div className="text-3xl font-bold text-primary">
                   {get.toFixed(2)} kcal/day
                 </div>
                 <p className="text-xs text-muted-foreground mt-2">
-                  Formula: (GEB × PA) + ETA = ({gebAverage.toFixed(2)} × {selectedPA}) + {(gebAverage * 0.1).toFixed(2)}
+                {/*  Formula: (GEB × PA) + ETA = ({gebAverage.toFixed(2)} × {selectedPA}) + {(gebAverage * 0.1).toFixed(2)} */}
+                    Fórmula: (GEB * PA) = ({gebAverage.toFixed(2)} * {selectedPA})
                 </p>
               </div>
             </div>

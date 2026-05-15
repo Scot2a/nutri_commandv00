@@ -60,12 +60,14 @@ export const usePatientStore = create<PatientStore>()(
       patients: [],
       addPatient: (patient) =>
         set((state) => ({
-          patients: [...state.patients, patient],
+          patients: [...state.patients, {...patient, records: patient.records || []}],
         })),
         updatePatient: (updatedPatient) =>
           set((state) => ({
             patients: state.patients.map((p) =>
-            p.id === updatedPatient.id ? updatedPatient : p 
+            p.id === updatedPatient.id 
+            ? {...updatedPatient, records: updatedPatient.records || p.records || []}
+             : p 
           ),
           })),
 
@@ -85,7 +87,7 @@ export const usePatientStore = create<PatientStore>()(
       updateLastRecord: (patientId, updates) =>
         set((state) => ({
           patients: state.patients.map((p) => {
-            if (p.id !== patientId || p.records.length === 0) return p;
+            if (p.id !== patientId || !p.records || p.records.length === 0) return p;
             const updatedRecords = [...p.records];
             const lastIndex = updatedRecords.length - 1;
             updatedRecords[lastIndex] = { ...updatedRecords[lastIndex], ...updates };
