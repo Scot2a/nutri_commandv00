@@ -77,7 +77,7 @@ export function GETCalculator({ gebAverage, onNext }: GETCalculatorProps) {
           </div>
 
           {/* ETA Display */}
-{/*          {selectedPA !== null && (
+          {selectedPA !== null && (
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground">
                 Efecto Termogénico de los Alimentos (ETA) - 10% of GEB
@@ -88,7 +88,7 @@ export function GETCalculator({ gebAverage, onNext }: GETCalculatorProps) {
                 </div>
               </div>
             </div>
-          )}* */}
+          )}*
 
           {/* GET Result */}
           {get !== null && (
@@ -102,8 +102,7 @@ export function GETCalculator({ gebAverage, onNext }: GETCalculatorProps) {
                   {get.toFixed(2)} kcal/day
                 </div>
                 <p className="text-xs text-muted-foreground mt-2">
-                {/*  Formula: (GEB × PA) + ETA = ({gebAverage.toFixed(2)} × {selectedPA}) + {(gebAverage * 0.1).toFixed(2)} */}
-                    Fórmula: (GEB * PA) = ({gebAverage.toFixed(2)} * {selectedPA})
+                  Formula: (GEB × PA) + ETA = ({gebAverage.toFixed(2)} × {selectedPA}) + {(gebAverage * 0.1).toFixed(2)}
                 </p>
               </div>
             </div>

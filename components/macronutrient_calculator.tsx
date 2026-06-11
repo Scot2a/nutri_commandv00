@@ -14,15 +14,15 @@ interface MacronutrientCalculatorProps {
 
 export interface MacroData {
   proteinMultiplier: number
-  proteinGrams: number
-  proteinKcals: number
+  proteins_percentage: number
+  proteins_g: number
+  proteins_kcals: number
   carbs_percentage: number
   carbs_kcal: number
   carbs_g: number
-  lipidPercentage: number
-  lipidKcals: number
-  lipidGrams: number
-  proteinPercentage: number
+  lipids_percentage: number
+  lipids_kcals: number
+  lipids_g: number
 }
 
 export function MacronutrientCalculator({
@@ -34,19 +34,19 @@ export function MacronutrientCalculator({
   const [carbs_percentage, setCarbsPercentage] = useState('45')
   const [lipidPercentage, setLipidPercentage] = useState('30')
 
-  const proteinGrams = parseFloat(proteinMultiplier) * bodyWeight
-  const proteinKcals = proteinGrams * 4
-  const proteinPercentage = (proteinKcals / get) * 100
+  const proteins_g = parseFloat(proteinMultiplier) * bodyWeight
+  const proteins_kcals = proteins_g * 4
+  const proteins_percentage = (proteins_kcals / get) * 100
 
-  const remainingKcals = get - proteinKcals
+  const remainingKcals = get - proteins_kcals
   const carbs_kcal = Math.min((parseFloat(carbs_percentage) / 100) * get, remainingKcals)
   const carbs_g = carbs_kcal / 4
 
-  const lipidKcals = Math.min((parseFloat(lipidPercentage) / 100) * get, remainingKcals)
-  const lipidGrams = lipidKcals / 9
+  const lipids_kcals = Math.min((parseFloat(lipidPercentage) / 100) * get, remainingKcals)
+  const lipids_g = lipids_kcals / 9
 
-  const totalKcals = proteinKcals + carbs_kcal + lipidKcals
-  const totalPercentage = proteinPercentage + parseFloat(carbs_percentage || "0") + parseFloat(lipidPercentage || "0")
+  const totalKcals = proteins_kcals + carbs_kcal + lipids_kcals
+  const totalPercentage = proteins_percentage + parseFloat(carbs_percentage || "0") + parseFloat(lipidPercentage || "0")
 
   const roundedTotalPercentage = Math.round(totalPercentage * 10) / 10;
   const roundedTotalKcals = Math.round(totalKcals);
@@ -80,15 +80,15 @@ export function MacronutrientCalculator({
     if (isValidDistribution) {
       onNext({
         proteinMultiplier: parseFloat(proteinMultiplier),
-        proteinGrams,
-        proteinKcals,
+        proteins_g,
+        proteins_kcals,
         carbs_percentage: parseFloat(carbs_percentage),
         carbs_kcal: carbs_kcal,
         carbs_g: carbs_g,
-        lipidPercentage: parseFloat(lipidPercentage),
-        lipidKcals: lipidKcals,
-        lipidGrams: lipidGrams,
-        proteinPercentage,
+        lipids_percentage: parseFloat(lipidPercentage),
+        lipids_kcals: lipids_kcals,
+        lipids_g: lipids_g,
+        proteins_percentage,
       })
     }
   }
@@ -117,7 +117,7 @@ export function MacronutrientCalculator({
               max="3"
             />
             <p className="text-xs text-muted-foreground">
-              Weight: {bodyWeight}kg × {proteinMultiplier} = {proteinGrams.toFixed(1)}g protein
+              Weight: {bodyWeight}kg × {proteinMultiplier} = {proteins_g.toFixed(1)}g protein
             </p>
           </div>
 
@@ -128,15 +128,15 @@ export function MacronutrientCalculator({
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-semibold text-foreground">Protein</h3>
                 <Badge variant="outline" style={{ borderColor: '#4ade80', color: '#4ade80' }}>
-                  {proteinPercentage.toFixed(1)}%
+                  {proteins_percentage.toFixed(1)}%
                 </Badge>
               </div>
               <div className="space-y-1 text-sm">
                 <div className="text-2xl font-bold text-green-500">
-                  {proteinKcals.toFixed(0)} kcal
+                  {proteins_kcals.toFixed(0)} kcal
                 </div>
                 <div className="text-muted-foreground">
-                  {proteinGrams.toFixed(1)}g
+                  {proteins_g.toFixed(1)}g
                 </div>
               </div>
             </div>
@@ -181,10 +181,10 @@ export function MacronutrientCalculator({
               </div>
               <div className="space-y-1 text-sm">
                 <div className="text-2xl font-bold text-orange-500">
-                  {lipidKcals.toFixed(0)} kcal
+                  {lipids_kcals.toFixed(0)} kcal
                 </div>
                 <div className="text-muted-foreground">
-                  {lipidGrams.toFixed(1)}g
+                  {lipids_g.toFixed(1)}g
                 </div>
               </div>
             </div>
