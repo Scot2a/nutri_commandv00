@@ -7,7 +7,8 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Trash2, Pencil, Plus, Mail, Phone, Calendar } from "lucide-react" 
 import type { Patient } from "@/src/patient_store/use_patient_store"
-import { PatientActionDialog } from "@/components/patient_action_dialog" 
+import { PatientActionDialog } from "@/components/patient_action_dialog"
+import { ClinicalEvolutionDialog } from "@/components/clinical_evolution" 
 
 interface PatientsListProps {
   patients: Patient[]
@@ -18,6 +19,7 @@ interface PatientsListProps {
 export function PatientsList({ patients, onDelete, onUpdate }: PatientsListProps) {
   const [searchTerm, setSearchTerm] = useState('')
   const [isActionDialogOpen, setIsActionDialogOpen] = useState(false)
+  const [isClinicalEvolutionOpen, setIsClinicalEvolutionOpen] = useState(false)
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null)
   const [actionMode, setActionMode] = useState<"edit" | "followup">("edit")
 
@@ -25,6 +27,11 @@ export function PatientsList({ patients, onDelete, onUpdate }: PatientsListProps
     setSelectedPatientId(patientId)
     setActionMode(mode)
     setIsActionDialogOpen(true)
+  }
+
+  const openClinicalEvolution = (patientId: string) => {
+    setSelectedPatientId(patientId)
+    setIsClinicalEvolutionOpen(true)
   }
 
   const filteredPatients = patients.filter((patient) =>
@@ -130,7 +137,17 @@ export function PatientsList({ patients, onDelete, onUpdate }: PatientsListProps
                     )}
                   </CardContent>
 
-                  <CardFooter className="grid grid-cols-2 gap-2 border-t pt-4 mt-auto">
+                  <CardFooter className="grid grid-cols-3 gap-2 border-t pt-4 mt-auto">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className="gap-2 border-primary/50 text-primary hover:bg-primary/5 text-xs"
+                      onClick={() => openClinicalEvolution(patient.id)}
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      Nueva Consulta
+                    </Button>
+
                     <Button 
                       variant="outline" 
                       size="sm"
@@ -164,6 +181,14 @@ export function PatientsList({ patients, onDelete, onUpdate }: PatientsListProps
           patientId={selectedPatientId}
           mode={actionMode}
           onClose={() => setIsActionDialogOpen(false)}
+        />
+      )}
+
+      {isClinicalEvolutionOpen && selectedPatientId && (
+        <ClinicalEvolutionDialog
+          isOpen={isClinicalEvolutionOpen}
+          patientId={selectedPatientId}
+          onClose={() => setIsClinicalEvolutionOpen(false)}
         />
       )}
     </>
