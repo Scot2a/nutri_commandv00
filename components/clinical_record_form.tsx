@@ -83,7 +83,7 @@ export function ClinicalRecordForm({
                 placeholder="0"
               />
             </div>
-          </div>
+          </div> 
           
           <div className="space-y-2">
             <Label htmlFor="age">Edad</Label>
