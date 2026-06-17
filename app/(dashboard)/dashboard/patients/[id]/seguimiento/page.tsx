@@ -71,6 +71,10 @@ export default function SeguimientoPage() {
     lastRecord?.notes ? [{ date: new Date(lastRecord.date).toLocaleDateString(), text: lastRecord.notes }] : []
   )
 
+  const previousMacroPercentages = useMemo(() => {
+    return lastRecord ? getMacroPercentages(lastRecord) : { protein: 0, carbs: 0, fats: 0 }
+  }, [lastRecord])
+
   // Calculate suggested macros based on weight change
   const macroSuggestion = useMemo<MacroSuggestion | null>(() => {
     if (!lastRecord || weight === '' || !patient) return null
@@ -223,21 +227,21 @@ export default function SeguimientoPage() {
                     <p className="text-xs text-muted-foreground">Proteína</p>
                     <div className="flex items-center justify-between mt-1">
                       <p className="text-lg font-bold text-foreground">{lastRecord.macros.proteins_g}g</p>
-                      <p className="text-xs text-primary">27%</p>
+                      <p className="text-xs text-primary">{previousMacroPercentages.protein}%</p>
                     </div>
                   </div>
-                  <div className="p-3 bg-orange/10 rounded-lg border border-orange/20">
+                  <div className="p-3 bg-orange-500/10 rounded-lg border border-orange-500/20">
                     <p className="text-xs text-muted-foreground">Carbohidratos</p>
                     <div className="flex items-center justify-between mt-1">
                       <p className="text-lg font-bold text-foreground">{lastRecord.macros.carbs_g}g</p>
-                      <p className="text-xs text-orange-500">50%</p>
+                      <p className="text-xs text-orange-600">{previousMacroPercentages.carbs}%</p>
                     </div>
                   </div>
-                  <div className="p-3 bg-green/10 rounded-lg border border-green/20">
+                  <div className="p-3 bg-green-600/10 rounded-lg border border-green-600/20">
                     <p className="text-xs text-muted-foreground">Grasas</p>
                     <div className="flex items-center justify-between mt-1">
                       <p className="text-lg font-bold text-foreground">{lastRecord.macros.lipids_g}g</p>
-                      <p className="text-xs text-green-600">23%</p>
+                      <p className="text-xs text-green-700">{previousMacroPercentages.fats}%</p>
                     </div>
                   </div>
                 </div>
