@@ -49,30 +49,28 @@ export function MacroDashboard({ current, target, patientName }: MacroDashboardP
         )}
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-        
-      {[
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {[
           { label: "Calorías", value: current.calories, max: target?.calories, unit: "kcal" },
           { label: "Proteína", value: current.proteins_g, max: target?.proteins_g, unit: "g" },
           { label: "Carbs", value: current.carbs_g, max: target?.carbs_g, unit: "g" },
           { label: "Lípidos", value: current.lipids_g, max: target?.lipids_g, unit: "g" },
         ].map((item) => (
-          <div key={item.label} className="flex flex-col gap-2">
-            <div className="flex justify-between items-baseline">
+          <div key={item.label} className="flex flex-col gap-2 p-3 bg-secondary/5 rounded-lg border border-border/50">
+            <div className="flex flex-col gap-1">
               <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 {item.label}
               </span>
-              <div className="text-right">
-                <span className="text-sm font-bold text-foreground">{item.value}</span>
-                <span className="text-[10px] ml-1 text-muted-foreground">
+              <div className="flex items-baseline gap-1">
+                <span className="text-lg font-bold text-foreground">{item.value}</span>
+                <span className="text-xs text-muted-foreground">
                   {isFreestyle ? item.unit : `/ ${item.max}${item.unit}`}
                 </span>
               </div>
             </div>
-            {/* The progress bar now stays visible but empty if in Freestyle */}
             <Progress 
               value={!isFreestyle ? (item.value / item.max!) * 100 : 0} 
-              className={`h-2 ${!isFreestyle ? getProgressColor(item.value, item.max!) : "bg-primary/20"}`}
+              className={`h-1.5 ${!isFreestyle ? getProgressColor(item.value, item.max!) : "bg-primary/20"}`}
               style={{ color: 'inherit' }}
             />
           </div>

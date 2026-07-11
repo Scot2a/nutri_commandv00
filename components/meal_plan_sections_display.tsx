@@ -118,35 +118,42 @@ export function MealSectionsDisplay({meals}: MealSectionsDisplayProps) {
                     return (
                       <div
                         key={food.id}
-                        className="group inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary/20 hover:bg-secondary/30 transition-colors border border-border/50"
+                        className="group flex flex-col gap-1 px-3 py-2 rounded-lg bg-secondary/20 hover:bg-secondary/30 transition-colors border border-border/50 min-w-max"
                       >
-                        <div className="flex items-center gap-2 min-w-0">
-                          <span className="font-medium text-sm text-foreground truncate">
-                            {food.name}
-                          </span>
-                          <Badge
-                            variant="outline"
-                            className="text-xs flex-shrink-0"
-                            style={{
-                              backgroundColor: `${categoryColor}20`,
-                              color: categoryColor,
-                              borderColor: categoryColor,
-                            }}
+                        <div className="flex items-center gap-2 justify-between">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <span className="font-medium text-sm text-foreground truncate">
+                              {food.name}
+                            </span>
+                            <Badge
+                              variant="outline"
+                              className="text-xs flex-shrink-0"
+                              style={{
+                                backgroundColor: `${categoryColor}20`,
+                                color: categoryColor,
+                                borderColor: categoryColor,
+                              }}
+                            >
+                              {food.quantity}x
+                            </Badge>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleRemoveFood(meal.id, food.id)}
+                            className="opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive hover:bg-destructive/10 h-5 w-5 p-0 flex-shrink-0 ml-1"
                           >
-                            {food.quantity}x
-                          </Badge>
+                            <X className="w-3 h-3" />
+                          </Button>
                         </div>
-                        <span className="text-xs text-muted-foreground flex-shrink-0">
-                          {totalValue.toFixed(0)}{food.unit}
-                        </span>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleRemoveFood(meal.id, food.id)}
-                          className="opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive hover:bg-destructive/10 h-5 w-5 p-0 flex-shrink-0"
-                        >
-                          <X className="w-3 h-3" />
-                        </Button>
+                        <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                          <span className="flex-shrink-0">
+                            {totalValue.toFixed(0)}{food.unit}
+                          </span>
+                          <span className="text-foreground font-medium flex-shrink-0">
+                            {(food.proteins_g * food.quantity).toFixed(0)}p {(food.carbs_g * food.quantity).toFixed(0)}c {(food.lipids_g * food.quantity).toFixed(0)}f
+                          </span>
+                        </div>
                       </div>
                     )
                   })}
