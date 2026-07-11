@@ -45,6 +45,7 @@ interface MealStore {
   addFoodToMeal: (mealId: string, food: MealPlanFood) => void
   removeFoodFromMeal: (mealId: string, foodId: string) => void
   updateFoodQuantity: (mealId: string, foodId: string, quantity: number) => void
+  updatePlan: (planId: string, updates: Partial<MealPlan>) => void
   deletePlan: (planId: string) => void
   deleteMeal: (mealId: string) => void
   addMeal: (mealType: 'breakfast' | 'lunch' | 'snack' | 'dinner') => void
@@ -133,6 +134,14 @@ export const useMealStore = create<MealStore>()(
           }
           return plan;
         }),
+      })),
+
+      updatePlan: (planId, updates) => set((state) => ({
+        plans: state.plans.map((plan) =>
+          plan.id === planId
+            ? { ...plan, ...updates }
+            : plan
+        ),
       })),
 
       deletePlan: (planId) => set((state) => {

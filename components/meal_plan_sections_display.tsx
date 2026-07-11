@@ -11,7 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { Trash2, Plus, X } from 'lucide-react'
+import { Plus, X } from 'lucide-react'
 import { useMealStore, type Meal, type MealPlanFood } from '@/src/meal_store/use_meal_store'
 import { getFoodCategoryColor } from '@/src/types/food'
 
@@ -110,7 +110,7 @@ export function MealSectionsDisplay({meals}: MealSectionsDisplayProps) {
                   No foods added yet
                 </p>
               ) : (
-                <div className="space-y-2">
+                <div className="flex flex-wrap gap-2">
                   {meal.foods.map((food) => {
                     const categoryColor = getFoodCategoryColor(food.categoryId)
                     const totalValue = food.amount_g_ml * food.quantity
@@ -118,38 +118,34 @@ export function MealSectionsDisplay({meals}: MealSectionsDisplayProps) {
                     return (
                       <div
                         key={food.id}
-                        className="flex items-center justify-between p-3 rounded-lg bg-secondary/20 group hover:bg-secondary/30 transition-colors"
+                        className="group inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary/20 hover:bg-secondary/30 transition-colors border border-border/50"
                       >
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium text-sm text-foreground">
-                              {food.name}
-                            </span>
-                            <Badge
-                              variant="outline"
-                              className="text-xs"
-                              style={{
-                                backgroundColor: `${categoryColor}20`,
-                                color: categoryColor,
-                                borderColor: categoryColor,
-                              }}
-                            >
-                              {food.categoryId}
-                            </Badge>
-                          </div>
-                          <p className="text-xs text-muted-foreground mt-1">
-                            <span className="font-medium text-foreground">{food.quantity} ración(es)</span> 
-                            {' '}• {totalValue.toFixed(1)}{food.unit} total 
-                            <span className="opacity-70"> ({food.amount_g_ml}{food.unit}/ración)</span>
-                          </p>
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className="font-medium text-sm text-foreground truncate">
+                            {food.name}
+                          </span>
+                          <Badge
+                            variant="outline"
+                            className="text-xs flex-shrink-0"
+                            style={{
+                              backgroundColor: `${categoryColor}20`,
+                              color: categoryColor,
+                              borderColor: categoryColor,
+                            }}
+                          >
+                            {food.quantity}x
+                          </Badge>
                         </div>
+                        <span className="text-xs text-muted-foreground flex-shrink-0">
+                          {totalValue.toFixed(0)}{food.unit}
+                        </span>
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => handleRemoveFood(meal.id, food.id)}
-                          className="opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive hover:bg-destructive/10"
+                          className="opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive hover:bg-destructive/10 h-5 w-5 p-0 flex-shrink-0"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <X className="w-3 h-3" />
                         </Button>
                       </div>
                     )

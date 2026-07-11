@@ -5,15 +5,18 @@ import { DashboardSidebar, MobileHeader } from '@/components/dashboard_sidebar'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Plus, Trash2, X } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { Plus, X } from 'lucide-react'
 import { useMealStore  } from '@/src/meal_store/use_meal_store'
 import { MealPlanBuilder } from '@/components/meal_plan_builder'
 import { MealSectionsDisplay } from '@/components/meal_plan_sections_display'
 
 export default function MealPlansPage() {
   
-    const { plans, currentPlanId, setCurrentPlan, createPlan, deletePlan } = useMealStore()
+    const { plans, currentPlanId, setCurrentPlan, createPlan, deletePlan, updatePlan } = useMealStore()
     const currentPlan = plans.find((p) => p.id === currentPlanId)
+    const [editingPlanId, setEditingPlanId] = useState<string | null>(null)
+    const [editingName, setEditingName] = useState('')
 
   const handleCreatePlan = () => {
     // If your createPlan action takes a name/date, you can pass it here
@@ -73,23 +76,73 @@ export default function MealPlansPage() {
                       onClick={() => setCurrentPlan(plan.id)}
                       className="w-full text-left"
                     >
-                      <h3 className="font-semibold text-foreground">{plan.name}</h3>
-                      <p className="text-xs text-muted-foreground mt-1">{plan.date}</p>
-                      <Badge variant="secondary" className="mt-3">
-                        {plan.meals.length} Section(s)
-                      </Badge>
+                      {editingPlanId === plan.id ? (
+                        <div className="space-y-2" onClick={(e) => e.stopPropagation()}>
+                          <Input
+                            type="text"
+                            value={editingName}
+                            onChange={(e) => setEditingName(e.target.value)}
+                            placeholder="Plan name..."
+                            className="h-8"
+                            autoFocus
+                          />
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              className="h-7 text-xs"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                updatePlan(plan.id, { name: editingName })
+                                setEditingPlanId(null)
+                              }}
+                            >
+                              Save
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-7 text-xs"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                setEditingPlanId(null)
+                              }}
+                            >
+                              Cancel
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <h3 
+                            className="font-semibold text-foreground cursor-text hover:text-primary transition-colors"
+                            onDoubleClick={(e) => {
+                              e.stopPropagation()
+                              setEditingPlanId(plan.id)
+                              setEditingName(plan.name)
+                            }}
+                          >
+                            {plan.name}
+                          </h3>
+                          <p className="text-xs text-muted-foreground mt-1">{plan.date}</p>
+                          <Badge variant="secondary" className="mt-3">
+                            {plan.meals.length} Section(s)
+                          </Badge>
+                        </>
+                      )}
                     </button>
                     
                     {/* Delete Plan Action */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        deletePlan(plan.id)
-                      }}
-                      className="absolute top-2 right-2 p-1 rounded-full text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
+                    {editingPlanId !== plan.id && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          deletePlan(plan.id)
+                        }}
+                        className="absolute top-2 right-2 p-1 rounded-full text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    )}
                   </div>
                 ))}
 
